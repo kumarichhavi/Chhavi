@@ -1,0 +1,41 @@
+import nerd.tuxmobil.fahrplan.congress.GradlePlugins
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath GradlePlugins.androidGradle
+        classpath GradlePlugins.gradleVersions
+        classpath GradlePlugins.sonarQubeGradle
+        classpath GradlePlugins.kotlinGradle
+        classpath GradlePlugins.unmockGradle
+        classpath GradlePlugins.androidJunitJacocoGradle
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+        maven { url "https://plugins.gradle.org/m2/" }
+        jcenter()
+    }
+}
+
+apply plugin: "com.github.ben-manes.versions"
+apply plugin: "com.vanniktech.android.junit.jacoco"
+
+dependencyUpdates {
+    def isNonStable = { String version ->
+        def stableKeyword = ["RELEASE", "FINAL", "GA"].any { qualifier -> version.toUpperCase().contains(qualifier) }
+        def regex = /^[0-9,.v-]+(-r)?$/
+        return !stableKeyword && !(version ==~ regex)
+    }
+    rejectVersionIf {
+        return isNonStable(it.candidate.version)
+    }
+}
